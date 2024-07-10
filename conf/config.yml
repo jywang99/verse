@@ -1,0 +1,17 @@
+server:
+  port: 51514
+  allowedOrigins:
+    - "*"
+db:
+  host: localhost
+  port: 54321
+  user: postgres
+  password: passwd
+  database: postgres
+  schema: media
+  sslmode: disable
+auth:
+  secret: secret
+log:
+  path: ext/log/verse.txt
+
