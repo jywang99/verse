@@ -15,9 +15,9 @@ var cfg = config.Config
 var logger = logging.Logger
 
 func main() {
-    config.LoadYml("conf/config.yml")
-    logging.InitLoggers()
-    db.Setup()
+    config.Init("conf/config.yml")
+    logging.Init()
+    db.Init()
 
     e := echo.New()
     e.Pre(middleware.RemoveTrailingSlash())

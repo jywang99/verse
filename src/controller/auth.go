@@ -8,6 +8,7 @@ import (
 	echojwt "github.com/labstack/echo-jwt"
 	"github.com/labstack/echo/v4"
 	"jy.org/verse/src/config"
+	e "jy.org/verse/src/entity"
 	"jy.org/verse/src/service"
 )
 
@@ -37,9 +38,9 @@ func login(c echo.Context) error {
         return echo.ErrUnauthorized
     }
 
-    user, ok := service.Authenticate(l.Email, l.Password)
-    if !ok {
-        return echo.ErrUnauthorized
+    user, err := service.Authenticate(l.Email, l.Password)
+    if err != nil {
+        return handleError(c, err)
     }
 
 	// Set custom claims
@@ -60,16 +61,15 @@ func login(c echo.Context) error {
     }
 
 	return c.JSONPretty(http.StatusOK, echo.Map{
-        "username": user.Username,
+        "username": user.Name,
 		"token": t,
 	}, "  ")
 }
 
 type Register struct {
-    Username string `json:"username"`
+    Name string `json:"name"`
     Email    string `json:"email"`
     Password string `json:"password"`
-    Name string `json:"name"`
 }
 
 func register(c echo.Context) error {
@@ -80,13 +80,12 @@ func register(c echo.Context) error {
     }
 
     // TODO validation
-    reg := service.Register{
-        Username: r.Username,
+    user := e.UserRegist{
+        Name: r.Name,
         Email: r.Email,
         Password: r.Password,
-        Name: r.Name,
     }
-    err := reg.Register()
+    err := service.Register(user)
     if err != nil {
         return handleError(c, err)
     }

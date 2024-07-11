@@ -9,7 +9,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func LoadYml(configPath string) {
+func Init(configPath string) {
     f, err := os.Open(configPath)
     if err != nil {
         log.Fatal(fmt.Errorf("Error loading config yml file: %v", err))

@@ -33,7 +33,7 @@ var Logger = &logger{
     INFO: log.New(os.Stdout, "INFO:", log.LstdFlags|log.Lshortfile),
 }
 
-func InitLoggers() {
+func Init() {
     // Setting up lumberjack logger for log rotation
 	logFile := &lumberjack.Logger{
 		Filename:   cfg.Path,

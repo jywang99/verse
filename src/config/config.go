@@ -2,11 +2,21 @@ package config
 
 import (
 	"errors"
+	"time"
 )
 
 type serverCfg struct {
     Port int `yaml:"port"`
     AllowedOrigins []string `yaml:"allowedOrigins"`
+}
+
+type dbPoolCfg struct {
+    MaxConns int `yaml:"maxConns"`
+    MinConns int `yaml:"minConns"`
+    MaxConnLifetime time.Duration `yaml:"maxConnLifetime"`
+    MaxConnIdleTime time.Duration `yaml:"maxConnIdleTime"`
+    HealthCheckPeriod time.Duration `yaml:"healthCheckPeriod"`
+    ConnTimeout time.Duration `yaml:"connTimeout"`
 }
 
 type dbCfg struct {
@@ -17,6 +27,7 @@ type dbCfg struct {
     Database string `yaml:"database"`
     Schema   string `yaml:"schema"`
     SSLMode  string `yaml:"sslmode"`
+    Pool     *dbPoolCfg `yaml:"pool"`
 }
 
 type authCfg struct {
@@ -42,6 +53,14 @@ var Config = &config{
     Db: &dbCfg{
         Schema: "media",
         SSLMode: "disable",
+        Pool: &dbPoolCfg{
+            MaxConns: 10,
+            MinConns: 1,
+            MaxConnLifetime: time.Hour,
+            MaxConnIdleTime: time.Minute * 30,
+            HealthCheckPeriod: time.Minute,
+            ConnTimeout: time.Second * 5,
+        },
     },
     Log: &logCfg{
         Path: "/tmp/verse.log",
