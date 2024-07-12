@@ -17,6 +17,8 @@ func handleError(c echo.Context, err error) error {
     switch handledErr.Type {
         case except.AuthErr:
             return c.JSON(http.StatusUnauthorized, body)
+        case except.BadRequestErr:
+            return c.JSON(http.StatusBadRequest, body)
         case except.ForbiddenErr:
             return c.JSON(http.StatusForbidden, body)
         case except.DbErr:

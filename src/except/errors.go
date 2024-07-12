@@ -4,6 +4,7 @@ type ErrType int
 
 const (
     AuthErr ErrType = iota
+    BadRequestErr
     ForbiddenErr
     DbErr
 )

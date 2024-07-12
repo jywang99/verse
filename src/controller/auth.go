@@ -80,7 +80,7 @@ func register(c echo.Context) error {
     }
 
     // TODO validation
-    user := e.UserRegist{
+    user := e.RegistUser{
         Name: r.Name,
         Email: r.Email,
         Password: r.Password,
@@ -106,7 +106,7 @@ func handleAuth(e *echo.Echo) *echo.Group {
     e.POST("/login", login)
     e.POST("/regist", register)
 
-    r := e.Group("/my")
+    r := e.Group("")
     config := echojwt.Config{
         NewClaimsFunc: func(c echo.Context) jwt.Claims {
             return new(jwtCustomClaims)

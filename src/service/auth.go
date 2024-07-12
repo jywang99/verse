@@ -6,20 +6,20 @@ import (
 	"jy.org/verse/src/except"
 )
 
-func Authenticate(email, password string) (e.UserAuth, error) {
+func Authenticate(email, password string) (e.AuthUser, error) {
     user, err := conn.GetUserByCreds(email, password)
     if err != nil {
         if err != pgx.ErrNoRows {
             msg := "Error while authenticating user:"
             logger.ERROR.Println(msg, err)
-            return e.UserAuth{}, except.NewHandledError(except.DbErr, msg)
+            return e.AuthUser{}, except.NewHandledError(except.DbErr, msg)
         }
-        return e.UserAuth{}, except.NewHandledError(except.AuthErr, "Invalid email or password")
+        return e.AuthUser{}, except.NewHandledError(except.AuthErr, "Invalid email or password")
     }
     return user, nil
 }
 
-func Register(user e.UserRegist) error {
+func Register(user e.RegistUser) error {
     err, unique := conn.CheckUniqueName(user.Name)
     if err != nil {
         logger.ERROR.Println("Error while checking unique name: ", err)
