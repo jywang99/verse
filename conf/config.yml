@@ -13,5 +13,5 @@ db:
 auth:
   secret: secret
 log:
-  path: ext/log/verse.txt
+  path: ext/log/verse.log
 

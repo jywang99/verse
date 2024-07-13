@@ -21,11 +21,29 @@ func main() {
 
     e := echo.New()
     e.Pre(middleware.RemoveTrailingSlash())
-    e.Use(middleware.Logger()) // TODO to file
-    e.Use(middleware.Recover())
     e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
         AllowOrigins: cfg.Server.AllowedOrigins,
         AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
+    }))
+
+    e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+        LogStatus:   true,
+        LogURI:      true,
+        LogError:    true,
+        LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
+            if v.Error == nil {
+                logger.INFO.Printf("uri=%s status=%d\n", v.URI, v.Status)
+            } else {
+                logger.ERROR.Printf("uri=%s status=%d error=%v\n", v.URI, v.Status, v.Error)
+            }
+            return nil
+        },
+    }))
+    e.Use(middleware.RecoverWithConfig(middleware.RecoverConfig{
+        LogErrorFunc: func(c echo.Context, err error, stack []byte) error {
+            logger.ERROR.Printf("error=%v stack=%s\n", err, stack)
+            return err
+        },
     }))
 
     controller.HandlePaths(e)

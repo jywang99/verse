@@ -7,7 +7,7 @@ import (
 )
 
 func getCollections(c echo.Context) error {
-    cg := e.DefaultCollectionGet()
+    cg := e.DefaultGetCollections()
     if err := c.Bind(cg); err != nil {
         return err
     }
@@ -26,6 +26,6 @@ func getCollections(c echo.Context) error {
 
 func handleCollection(g *echo.Group) {
     r := g.Group("/collection")
-    r.GET("", getCollections)
+    r.POST("", getCollections)
 }
 

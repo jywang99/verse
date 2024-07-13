@@ -24,7 +24,7 @@ type queryTracer struct {
 }
 
 func (tracer *queryTracer) TraceQueryStart(ctx context.Context, _ *pgx.Conn, data pgx.TraceQueryStartData) context.Context {
-    tracer.log.Println("SQL query: ", "sql", data.SQL, "args", data.Args)
+    tracer.log.Println("sql", data.SQL, "args", data.Args)
     return ctx
 }
 

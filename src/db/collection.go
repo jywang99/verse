@@ -13,13 +13,11 @@ func (conn *dbConn) GetCollections(gc e.GetCollections) (e.GotCollections, error
     query := fmt.Sprintf("SELECT %s, %s, %s, %s, %s FROM %s",
         cs.Id, cs.DispName, cs.Desc, cs.Created, cs.Parent, cs.CollectionTable,
     )
-
-    where, args := GetCollectionArgs(gc)
+    // where
+    where, args := getCollectiionWhere(gc)
     query += where
-
     // order by
-    query += fmt.Sprintf(" ORDER BY %s %s LIMIT $%d OFFSET $%d", gc.Pg.By, gc.Pg.GetDesc(), len(args)+1, len(args)+2)
-    args = append(args, gc.Pg.PageSize, gc.Pg.Offset)
+    query += getOrderBy(gc.Pg)
 
     rows, err := conn.pool.Query(context.Background(), query, args...)
     if err != nil {
@@ -43,7 +41,7 @@ func (conn *dbConn) GetCollections(gc e.GetCollections) (e.GotCollections, error
 
 func (conn *dbConn) CountCollections(gc e.GetCollections) (int, error) {
     query := fmt.Sprintf("SELECT COUNT(*) FROM %s", cs.CollectionTable)
-    where, args := GetCollectionArgs(gc)
+    where, args := getCollectiionWhere(gc)
     query += where
 
     row := conn.pool.QueryRow(context.Background(), query, args...)
@@ -55,7 +53,7 @@ func (conn *dbConn) CountCollections(gc e.GetCollections) (int, error) {
     return count, nil
 }
 
-func GetCollectionArgs(gc e.GetCollections) (string, []any) {
+func getCollectiionWhere(gc e.GetCollections) (string, []any) {
     query := ""
     args := []any{}
     if gc.Keyword != nil {

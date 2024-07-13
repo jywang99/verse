@@ -25,5 +25,27 @@ const (
 
     Ascend = "ASC"
     Descend = "DESC"
+
+    // EntryCast
+    EntryCastTable = "entry_cast"
+    EntryId = "entry_id"
+    CastId = "cast_id"
+    
+    // EntryTag
+    EntryTagTable = "entry_tag"
+    TagId = "tag_id"
+
+    // Tag
+    TagTable = "tag"
+
+    // Cast
+    CastTable = "\"cast\""
+    PicPath = "pic_path"
 )
+
+var UserCols = []string{ Id, Name, Email, Password, Created }
+var CollectionCols = []string{ Id, Path, DispName, Parent, Created }
+var EntryCols = []string{ Id, Path, DispName, Desc, ThumbStatic, ThumbDynamic, Created, Updated, Aired }
+var EntryCastCols = []string{ EntryId, CastId }
+var EntryTagCols = []string{ EntryId, TagId }
 
