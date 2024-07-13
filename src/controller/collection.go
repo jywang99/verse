@@ -16,7 +16,7 @@ func getCollections(c echo.Context) error {
         return handleError(c, err)
     }
 
-    cols, err := service.GetCollections(cg)
+    cols, err := service.GetCollection(*cg)
     if err != nil {
         return handleError(c, err)
     }
@@ -24,8 +24,8 @@ func getCollections(c echo.Context) error {
     return c.JSON(200, cols)
 }
 
-func handleCollections(g *echo.Group) {
-    r := g.Group("/collections")
+func handleCollection(g *echo.Group) {
+    r := g.Group("/collection")
     r.GET("", getCollections)
 }
 

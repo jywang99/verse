@@ -24,6 +24,7 @@ type Paging struct {
     Desc bool `json:"desc"`
     PageSize int `json:"pageSize"`
     Offset int `json:"offset"`
+    GetTotal bool `json:"getTotal"`
 }
 
 func (pg Paging) GetDesc() string {
@@ -35,10 +36,11 @@ func (pg Paging) GetDesc() string {
 
 type GetCollections struct {
     Pg Paging `json:"paging"`
+    Keyword *string `json:"keyword"`
 }
 
-func DefaultCollectionGet() GetCollections {
-    return GetCollections{
+func DefaultCollectionGet() *GetCollections {
+    return &GetCollections{
         Pg: Paging{
             By: cs.Id,
             Desc: false,
@@ -67,7 +69,17 @@ type GotCollection struct {
     Parent *int `json:"parent"`
 }
 
+type GotPaging struct {
+    Total *int `json:"total"`
+}
+
 type GotCollections struct {
     Collections []GotCollection `json:"collections"`
+    Pg *GotPaging `json:"paging"`
+}
+
+type GetEntities struct {
+    Pg Paging `json:"paging"`
+    GetTotal bool `json:"getTotal"`
 }
 
