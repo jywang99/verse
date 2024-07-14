@@ -22,7 +22,7 @@ func (conn *dbConn) GetEntries(ge e.GetEntries) (e.GotEntries, error) {
         cs.EntryTable,
     )
     // where
-    where, args := getEntryWhere(ge)
+    where, args := getEntriesWhere(ge)
     query += where
     // order by
     query += getOrderBy(ge.Pg)
@@ -49,7 +49,7 @@ func (conn *dbConn) GetEntries(ge e.GetEntries) (e.GotEntries, error) {
 
 func (conn *dbConn) CountEntries(ge e.GetEntries) (int, error) {
     query := fmt.Sprintf("SELECT COUNT(*) FROM %s e", cs.EntryTable)
-    where, args := getEntryWhere(ge)
+    where, args := getEntriesWhere(ge)
     query += where
 
     row := conn.pool.QueryRow(context.Background(), query, args...)
@@ -61,7 +61,8 @@ func (conn *dbConn) CountEntries(ge e.GetEntries) (int, error) {
     return count, nil
 }
 
-func getEntryWhere(ge e.GetEntries) (string, []any) {
+// TODO $ parametrization
+func getEntriesWhere(ge e.GetEntries) (string, []any) {
     args := []any{}
     stmts := []string{}
 
@@ -114,11 +115,11 @@ func getEntryWhere(ge e.GetEntries) (string, []any) {
 
 func (conn *dbConn) GetEntry(id int) (e.GotEntry, error) {
     query := fmt.Sprintf(`SELECT 
-        e.%s, e.%s, e.%s, e.%s, e.%s, e.%s, e.%s, e.%s, e.%s, e.%s,
+        e.%s, e.%s, e.%s, e.%s, e.%s, e.%s, e.%s, e.%s, e.%s, e.%s, e.%s,
         (SELECT array_agg(%s) FROM %s WHERE %s=e.%s) as tag_ids,
         (SELECT array_agg(%s) FROM %s WHERE %s=e.%s) as cast_ids
         FROM %s e WHERE e.%s = %d`,
-        cs.Id, cs.DispName, cs.Desc, cs.ThumbStatic, cs.ThumbDynamic, cs.Created, cs.Updated, cs.Aired, cs.Parent, cs.Path,
+        cs.Id, cs.DispName, cs.Desc, cs.ThumbStatic, cs.ThumbDynamic, cs.Created, cs.Updated, cs.Aired, cs.Parent, cs.Path, cs.ContentFiles,
         cs.TagId, cs.EntryTagTable, cs.EntryId, cs.Id,
         cs.CastId, cs.EntryCastTable, cs.EntryId, cs.Id, 
         cs.EntryTable, cs.Id, id,
@@ -126,7 +127,7 @@ func (conn *dbConn) GetEntry(id int) (e.GotEntry, error) {
 
     row := conn.pool.QueryRow(context.Background(), query)
     gel := e.NewGotEntry()
-    err := row.Scan(&gel.Meta.Id, &gel.Meta.Name, &gel.Meta.Desc, &gel.Meta.ThumbStatic, &gel.Meta.ThumbDynamic, &gel.Meta.Created, &gel.Meta.Updated, &gel.Meta.Aired, &gel.Meta.ParentId, &gel.Path, &gel.Meta.TagIds, &gel.Meta.CastIds)
+    err := row.Scan(&gel.Meta.Id, &gel.Meta.Name, &gel.Meta.Desc, &gel.Meta.ThumbStatic, &gel.Meta.ThumbDynamic, &gel.Meta.Created, &gel.Meta.Updated, &gel.Meta.Aired, &gel.Meta.ParentId, &gel.Path, &gel.Files, &gel.Meta.TagIds, &gel.Meta.CastIds)
     if err != nil {
         return e.GotEntry{}, err
     }

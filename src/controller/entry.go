@@ -35,6 +35,12 @@ func getEntry(c echo.Context) error {
         return handleError(c, err)
     }
 
+    token, err := genMediaToken(entry.Path)
+    if err != nil {
+        return handleError(c, err)
+    }
+    entry.Token = token
+
     return c.JSON(200, entry)
 }
 

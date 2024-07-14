@@ -14,9 +14,9 @@ import (
 
 var authCfg = config.Config.Auth
 
-// jwtCustomClaims are custom claims extending default ones.
+// jwtUserClaims are custom claims extending default ones.
 // See https://github.com/golang-jwt/jwt for more examples
-type jwtCustomClaims struct {
+type jwtUserClaims struct {
     Id int `json:"id"`
 	jwt.RegisteredClaims
 }
@@ -44,7 +44,7 @@ func login(c echo.Context) error {
     }
 
 	// Set custom claims
-	claims := &jwtCustomClaims{
+	claims := &jwtUserClaims{
         user.Id,
 		jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 72)),
@@ -79,7 +79,6 @@ func register(c echo.Context) error {
         return err
     }
 
-    // TODO validation
     user := e.RegistUser{
         Name: r.Name,
         Email: r.Email,
@@ -96,9 +95,9 @@ func register(c echo.Context) error {
 }
 
 // Parse claims from JWT token to retrieve user info
-func GetClaims(c echo.Context) *jwtCustomClaims {
+func getClaims(c echo.Context) *jwtUserClaims {
     user := c.Get("user").(*jwt.Token)
-    claims := user.Claims.(*jwtCustomClaims)
+    claims := user.Claims.(*jwtUserClaims)
     return claims
 }
 
@@ -109,7 +108,7 @@ func handleAuth(e *echo.Echo) *echo.Group {
     r := e.Group("")
     config := echojwt.Config{
         NewClaimsFunc: func(c echo.Context) jwt.Claims {
-            return new(jwtCustomClaims)
+            return new(jwtUserClaims)
         },
         SigningKey: signKey,
     }

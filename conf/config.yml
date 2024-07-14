@@ -10,8 +10,12 @@ db:
   database: postgres
   schema: media
   sslmode: disable
+file:
+  mediaRoot: /mnt/f
+  thumbRoot: /soft/thumbgen/work/out
 auth:
   secret: secret
+  mediaSecret: msecret
 log:
   path: ext/log/verse.log
 

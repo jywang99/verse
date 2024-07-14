@@ -30,8 +30,14 @@ type dbCfg struct {
     Pool     *dbPoolCfg `yaml:"pool"`
 }
 
+type fileCfg struct {
+    MediaRoot string `yaml:"mediaRoot"`
+    ThumbRoot string `yaml:"thumbRoot"`
+}
+
 type authCfg struct {
     Secret string `yaml:"secret"`
+    MediaSecret string `yaml:"mediaSecret"`
 }
 
 type logCfg struct {
@@ -42,6 +48,7 @@ type config struct {
     Server *serverCfg `yaml:"server"`
     Auth *authCfg `yaml:"auth"`
     Db *dbCfg `yaml:"db"`
+    File *fileCfg `yaml:"file"`
     Log *logCfg `yaml:"log"`
 }
 
@@ -49,6 +56,7 @@ var Config = &config{
     Server: &serverCfg{},
     Auth: &authCfg{
         Secret: "17G0W9V6aMGJ",
+        MediaSecret: "eat5yUa4j2zC",
     },
     Db: &dbCfg{
         Schema: "media",
@@ -62,6 +70,7 @@ var Config = &config{
             ConnTimeout: time.Second * 5,
         },
     },
+    File: &fileCfg{},
     Log: &logCfg{
         Path: "/tmp/verse.log",
     },

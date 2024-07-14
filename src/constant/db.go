@@ -22,6 +22,7 @@ const (
     ThumbDynamic = "thumb_dynamic"
     Updated = "updated"
     Aired = "aired"
+    ContentFiles = "content_files"
 
     Ascend = "ASC"
     Descend = "DESC"
