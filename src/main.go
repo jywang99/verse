@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"jy.org/verse/src/config"
+	cs "jy.org/verse/src/constant"
 	"jy.org/verse/src/controller"
 	"jy.org/verse/src/db"
 	"jy.org/verse/src/logging"
@@ -24,6 +25,7 @@ func main() {
     e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
         AllowOrigins: cfg.Server.AllowedOrigins,
         AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
+        ExposeHeaders: []string{cs.ContentRange},
     }))
 
     e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{

@@ -13,6 +13,7 @@ db:
 file:
   mediaRoot: /mnt/f
   thumbRoot: /soft/thumbgen/work/out
+  maxStreamSize: 1048576
 auth:
   secret: secret
   mediaSecret: msecret

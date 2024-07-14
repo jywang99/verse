@@ -33,6 +33,7 @@ type dbCfg struct {
 type fileCfg struct {
     MediaRoot string `yaml:"mediaRoot"`
     ThumbRoot string `yaml:"thumbRoot"`
+    MaxStreamSize int64 `yaml:"maxStreamSize"`
 }
 
 type authCfg struct {
@@ -92,6 +93,10 @@ func Validate() error {
     log := Config.Log
     if log.Path == "" {
         return errors.New("Invalid log path")
+    }
+    file := Config.File
+    if file.MediaRoot == "" || file.ThumbRoot == "" || file.MaxStreamSize == 0 {
+        return errors.New("Invalid file config")
     }
 
     return nil

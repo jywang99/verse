@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -9,6 +10,8 @@ import (
 	echojwt "github.com/labstack/echo-jwt"
 	"github.com/labstack/echo/v4"
 	"jy.org/verse/src/config"
+	cs "jy.org/verse/src/constant"
+	"jy.org/verse/src/entity"
 	"jy.org/verse/src/service"
 )
 
@@ -43,12 +46,23 @@ func getPartialContent(c echo.Context) error {
 	path := claims.AllowedPath
     file := c.QueryParam("file")
 
-    err := service.SeekVideo(path, file)
+    var start, end int64
+    fmt.Sscanf(c.Request().Header.Get("Range"), "bytes=%d-%d", &start, &end)
+    reqHeads := entity.GetPartContent{
+        RangeStart: start,
+        RangeEnd: end,
+    }
+
+    respHeads, content, err := service.SeekVideo(path, file, reqHeads)
     if err != nil {
         return handleError(c, err)
     }
 
-    return c.String(http.StatusOK, file) // TODO
+    c.Response().Header().Set(cs.ContentType, respHeads.ContentType)
+    c.Response().Header().Set(cs.ContentLength, fmt.Sprintf("%d", respHeads.ContentLength))
+    c.Response().Header().Set(cs.ContentRange, fmt.Sprintf("bytes %d-%d/%d", respHeads.CRangeStart, respHeads.CRangeEnd, respHeads.TotalLength))
+    c.Response().Header().Set(cs.AcceptRanges, "bytes")
+    return c.Blob(http.StatusPartialContent, respHeads.ContentType, *content)
 }
 
 func getStaticContent(c echo.Context) error {
