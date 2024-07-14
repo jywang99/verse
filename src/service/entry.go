@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/jackc/pgx/v5"
 	e "jy.org/verse/src/entity"
 	"jy.org/verse/src/except"
 )
@@ -78,11 +79,15 @@ func getCastsAndTags(es e.GotEntries) (*[]e.GotCastLite, *[]e.GotTagLite, error)
     return casts, tags, nil
 }
 
-func SetToSlice[T comparable](set map[T]bool) []T {
-    res := make([]T, 0, len(set))
-    for k := range set {
-        res = append(res, k)
+func GetEntry(id int) (e.GotEntry, error) {
+    entry, err := conn.GetEntry(id)
+    if err != nil {
+        if err == pgx.ErrNoRows {
+            return entry, except.NewHandledError(except.NotFoundErr, "Entry not found")
+        }
+        logger.ERROR.Println("Error while getting entry: ", err)
+        return entry, except.NewHandledError(except.DbErr, "Error while getting entry")
     }
-    return res
-}
 
+    return entry, nil
+}

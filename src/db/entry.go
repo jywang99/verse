@@ -112,3 +112,25 @@ func getEntryWhere(ge e.GetEntries) (string, []any) {
     return where, args
 }
 
+func (conn *dbConn) GetEntry(id int) (e.GotEntry, error) {
+    query := fmt.Sprintf(`SELECT 
+        e.%s, e.%s, e.%s, e.%s, e.%s, e.%s, e.%s, e.%s, e.%s, e.%s,
+        (SELECT array_agg(%s) FROM %s WHERE %s=e.%s) as tag_ids,
+        (SELECT array_agg(%s) FROM %s WHERE %s=e.%s) as cast_ids
+        FROM %s e WHERE e.%s = %d`,
+        cs.Id, cs.DispName, cs.Desc, cs.ThumbStatic, cs.ThumbDynamic, cs.Created, cs.Updated, cs.Aired, cs.Parent, cs.Path,
+        cs.TagId, cs.EntryTagTable, cs.EntryId, cs.Id,
+        cs.CastId, cs.EntryCastTable, cs.EntryId, cs.Id, 
+        cs.EntryTable, cs.Id, id,
+    )
+
+    row := conn.pool.QueryRow(context.Background(), query)
+    gel := e.NewGotEntry()
+    err := row.Scan(&gel.Meta.Id, &gel.Meta.Name, &gel.Meta.Desc, &gel.Meta.ThumbStatic, &gel.Meta.ThumbDynamic, &gel.Meta.Created, &gel.Meta.Updated, &gel.Meta.Aired, &gel.Meta.ParentId, &gel.Path, &gel.Meta.TagIds, &gel.Meta.CastIds)
+    if err != nil {
+        return e.GotEntry{}, err
+    }
+
+    return gel, nil
+}
+

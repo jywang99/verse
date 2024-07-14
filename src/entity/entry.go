@@ -45,8 +45,14 @@ type GotEntryLite struct {
 }
 
 type GotEntry struct {
-    Meta GotEntryLite `json:",inline"`
+    Meta GotEntryLite `json:"meta"`
     Path string `json:"path"`
+}
+
+func NewGotEntry() GotEntry {
+    return GotEntry{
+        Meta: GotEntryLite{},
+    }
 }
 
 type GotEntries struct {

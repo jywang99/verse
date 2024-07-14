@@ -24,8 +24,23 @@ func getEntries(c echo.Context) error {
     return c.JSON(200, entries)
 }
 
+func getEntry(c echo.Context) error {
+    id, err := parseIdParam(c, "id")
+    if err != nil {
+        return handleError(c, err)
+    }
+
+    entry, err := service.GetEntry(id)
+    if err != nil {
+        return handleError(c, err)
+    }
+
+    return c.JSON(200, entry)
+}
+
 func handleEntry(g *echo.Group) {
     r := g.Group("/entry")
     r.POST("", getEntries)
+    r.GET("/:id", getEntry)
 }
 
