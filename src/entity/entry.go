@@ -70,8 +70,3 @@ type GotCastLite struct {
     Pic *string `json:"pic"`
 }
 
-type GotTagLite struct {
-    Id int `json:"id"`
-    Name string `json:"name"`
-}
-
