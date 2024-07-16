@@ -2,37 +2,26 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
 
 	"jy.org/verse/src/constant"
 	e "jy.org/verse/src/entity"
 	"jy.org/verse/src/except"
+	"jy.org/verse/src/service/file"
 )
 
 func SeekVideo(pPath, subPath string, get e.GetPartContent) (*e.GotPartContent, *[]byte, error) {
     fPath := filepath.Join(cfg.File.MediaRoot, pPath, subPath)
-    mime, err := getMime(fPath)
+    mime, err := file.GetMime(fPath)
     if err != nil {
         return nil, nil, err
     }
 
-    stat, err := os.Stat(fPath)
+    file, stat, err := file.OpenFile(fPath)
     if err != nil {
-        logger.ERROR.Println("Failed to stat file: ", err)
-        return nil, nil, errors.New("Unable to open file")
+        return nil, nil, err
     }
-    if stat.IsDir() {
-        return nil, nil, except.NewHandledError(except.ForbiddenErr, "Invalid file path")
-    }
-
-    file, err := os.Open(fPath)
-	if err != nil {
-        logger.ERROR.Println("Failed to open file: ", err)
-		return nil, nil, errors.New("Unable to open file")
-	}
-	defer file.Close()
 
     fileSize := stat.Size()
     // default rangeEnd
@@ -74,7 +63,7 @@ func SeekVideo(pPath, subPath string, get e.GetPartContent) (*e.GotPartContent, 
 
 func GetStaticContent(pPath, subPath string) (*os.File, string, error) {
     fPath := filepath.Join(cfg.File.MediaRoot, pPath, subPath)
-    mime, err := getMime(fPath)
+    mime, err := file.GetMime(fPath)
     if err != nil {
         return nil, "", err
     }
@@ -84,34 +73,11 @@ func GetStaticContent(pPath, subPath string) (*os.File, string, error) {
         return nil, "", except.NewHandledError(except.BadRequestErr, "Invalid file type")
     }
 
-    // open file
-    stat, err := os.Stat(fPath)
+    file, _, err := file.OpenFile(fPath)
     if err != nil {
-        logger.ERROR.Println("Failed to stat file: ", err)
-        return nil, "", errors.New("Unable to open file")
-    }
-    if stat.IsDir() {
-        return nil, "", except.NewHandledError(except.ForbiddenErr, "Invalid file path")
-    }
-    file, err := os.Open(fPath)
-    if err != nil {
-        logger.ERROR.Println("Failed to open file: ", err)
-        return nil, "", errors.New("Unable to open file")
+        return nil, "", err
     }
 
     return file, mime, nil
-}
-
-func getMime(fpath string) (string, error) {
-    ext := filepath.Ext(fpath)
-    if len(ext) < 2 {
-        return "", except.NewHandledError(except.BadRequestErr, "Invalid file type")
-    }
-    ext = ext[1:]
-    ftype, got := constant.FileTypes.GetType(ext)
-    if !got {
-        return "", except.NewHandledError(except.BadRequestErr, "Invalid file type")
-    }
-    return fmt.Sprintf("%s/%s", ftype, ext), nil
 }
 

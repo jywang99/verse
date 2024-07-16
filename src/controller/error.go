@@ -12,7 +12,8 @@ func handleError(c echo.Context, err error) error {
     body := map[string]string{"error": err.Error()}
     handledErr, ok := err.(except.HandledError)
     if !ok {
-        return err
+        log.Printf("Unhandled error: %v", handledErr)
+        return c.JSON(http.StatusInternalServerError, body)
     }
     switch handledErr.Type {
         case except.AuthErr:

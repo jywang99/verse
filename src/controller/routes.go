@@ -8,7 +8,10 @@ func HandlePaths(e *echo.Echo) {
     handleCollection(r)
     handleEntry(r)
     handleTag(r)
+    handleCast(r)
+    handleThumb(r)
 
+    // media has its own auth
     handleMedia(e)
 }
 

@@ -33,6 +33,7 @@ type dbCfg struct {
 type fileCfg struct {
     MediaRoot string `yaml:"mediaRoot"`
     ThumbRoot string `yaml:"thumbRoot"`
+    CastRoot string `yaml:"castRoot"`
     MaxStreamSize int64 `yaml:"maxStreamSize"`
 }
 

@@ -8,6 +8,16 @@ func GetTags(gt entity.GetTags) (*entity.GotTags, error) {
         return nil, err
     }
 
+    if !gt.Pg.GetTotal {
+        return got, nil
+    }
+
+    count, err := conn.CountTags(gt)
+    if err != nil {
+        return nil, err
+    }
+    got.Pg.Total = &count
+
     return got, nil
 }
 

@@ -37,6 +37,7 @@ func (gt GetTags) Validate() error {
 
 type GotTags struct {
     Tags []GotTagLite `json:"tags"`
+    Pg GotPaging `json:"paging"`
 }
 
 func NewGotTags() *GotTags {

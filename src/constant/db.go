@@ -41,6 +41,7 @@ const (
 
     // Cast
     CastTable = "\"cast\""
+    BirthDay = "birthday"
     PicPath = "pic_path"
 )
 

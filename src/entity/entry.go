@@ -64,9 +64,3 @@ type GotEntries struct {
     Tags *[]GotTagLite `json:"tags"`
 }
 
-type GotCastLite struct {
-    Id int `json:"id"`
-    Name string `json:"name"`
-    Pic *string `json:"pic"`
-}
-

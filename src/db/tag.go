@@ -107,6 +107,22 @@ func (conn *dbConn) GetTags(gt e.GetTags) (*e.GotTags, error) {
     return got, nil
 }
 
+func (conn *dbConn) CountTags(gt e.GetTags) (int, error) {
+    query := fmt.Sprintf("SELECT COUNT(%s) FROM %s", cs.Id, cs.TagTable)
+    where, args := getTagsWhere(gt)
+    query += where
+
+    row := conn.pool.QueryRow(context.Background(), query, args...)
+    var count int
+    err := row.Scan(&count)
+    if err != nil {
+        logger.ERROR.Println("Error while counting tags: ", err)
+        return 0, except.NewHandledError(except.DbErr, "Error while counting tags")
+    }
+
+    return count, nil
+}
+
 func getTagsWhere(gt e.GetTags) (string, []any) {
     args := []any{}
     stmts := []string{}
