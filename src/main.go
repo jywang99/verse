@@ -24,7 +24,8 @@ func main() {
     e.Pre(middleware.RemoveTrailingSlash())
     e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
         AllowOrigins: cfg.Server.AllowedOrigins,
-        AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
+        AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization, echo.HeaderAccessControlAllowCredentials},
+        AllowCredentials: true,
         ExposeHeaders: []string{cs.ContentRange},
     }))
 

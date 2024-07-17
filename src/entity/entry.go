@@ -48,7 +48,6 @@ type GotEntry struct {
     Meta GotEntryLite `json:"meta"`
     Path string `json:"path"`
     Files []string `json:"files"`
-    Token string `json:"token"`
 }
 
 func NewGotEntry() GotEntry {

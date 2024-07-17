@@ -1,7 +1,7 @@
 server:
   port: 51514
   allowedOrigins:
-    - "*"
+    - "http://localhost:5173"
 db:
   host: localhost
   port: 54321

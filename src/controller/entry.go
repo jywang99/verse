@@ -1,6 +1,9 @@
 package controller
 
 import (
+	"net/http"
+	"time"
+
 	"github.com/labstack/echo/v4"
 	"jy.org/verse/src/entity"
 	"jy.org/verse/src/service"
@@ -39,7 +42,14 @@ func getEntry(c echo.Context) error {
     if err != nil {
         return handleError(c, err)
     }
-    entry.Token = token
+
+    cookie := http.Cookie{
+        Name: "token",
+        Value: token,
+        Expires: time.Now().Add(time.Hour),
+        Path: "/media",
+    }
+    c.SetCookie(&cookie)
 
     return c.JSON(200, entry)
 }
