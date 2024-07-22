@@ -14,7 +14,7 @@ file:
   mediaRoot: /mnt/f
   thumbRoot: /soft/thumbgen/work/out
   castRoot: /mnt/f/models
-  maxStreamSize: 1048576
+  maxStreamSize: 2097152
 auth:
   secret: secret
   mediaSecret: msecret

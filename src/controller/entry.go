@@ -46,8 +46,9 @@ func getEntry(c echo.Context) error {
     cookie := http.Cookie{
         Name: "token",
         Value: token,
-        Expires: time.Now().Add(time.Hour),
-        Path: "/media",
+	SameSite: http.SameSiteStrictMode,
+        Expires: time.Now().Add(time.Hour), // TODO config
+        Path: "/media", // TODO one for each entry
     }
     c.SetCookie(&cookie)
 

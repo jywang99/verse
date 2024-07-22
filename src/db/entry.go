@@ -66,16 +66,16 @@ func getEntriesWhere(ge e.GetEntries) (string, []any) {
     args := []any{}
     stmts := []string{}
 
-    if ge.Keyword != nil {
+    if ge.Keyword != nil && *ge.Keyword != "" {
         stmts = append(stmts, fmt.Sprintf("(%s ILIKE $1 or %s ILIKE $1)", cs.DispName, cs.Desc))
         args = append(args, fmt.Sprintf("%%%s%%", *ge.Keyword))
     }
 
-    if ge.ParentIds != nil {
+    if ge.ParentIds != nil && len(*ge.ParentIds) > 0 {
         stmts = append(stmts, fmt.Sprintf("e.%s IN (%s)", cs.Parent, arrayToString(*ge.ParentIds, ",")))
     }
 
-    if ge.CastIds != nil {
+    if ge.CastIds != nil && len(*ge.CastIds) > 0 {
         stmts = append(stmts, fmt.Sprintf(`e.%s IN (
                 SELECT %s
                 FROM %s
@@ -90,7 +90,7 @@ func getEntriesWhere(ge e.GetEntries) (string, []any) {
         )
     }
 
-    if ge.TagIds != nil {
+    if ge.TagIds != nil && len(*ge.TagIds) > 0 {
         stmts = append(stmts, fmt.Sprintf(`e.%s IN (
                 SELECT %s
                 FROM %s

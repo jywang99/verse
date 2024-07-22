@@ -10,7 +10,6 @@ import (
 
 type GetEntries struct {
     Pg Paging `json:"paging"`
-    CollectionId *int `json:"collectionId"`
     Keyword *string `json:"keyword"`
     ParentIds *[]int `json:"parents"`
     TagIds *[]int `json:"tagIds"`
@@ -57,7 +56,7 @@ func NewGotEntry() GotEntry {
 }
 
 type GotEntries struct {
-    Entries []GotEntryLite `json:"entities"`
+    Entries []GotEntryLite `json:"entries"`
     Pg *GotPaging `json:"paging"`
     Casts *[]GotCastLite `json:"casts"`
     Tags *[]GotTagLite `json:"tags"`

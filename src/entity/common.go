@@ -1,8 +1,8 @@
 package entity
 
 import (
-	cs "jy.org/verse/src/constant"
-	"jy.org/verse/src/except"
+    cs "jy.org/verse/src/constant"
+    "jy.org/verse/src/except"
 )
 
 type Paging struct {
