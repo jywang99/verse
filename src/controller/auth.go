@@ -1,24 +1,21 @@
 package controller
 
 import (
-	"net/http"
-	"time"
+    "net/http"
+    "time"
 
-	"github.com/golang-jwt/jwt/v4"
-	echojwt "github.com/labstack/echo-jwt"
-	"github.com/labstack/echo/v4"
-	"jy.org/verse/src/config"
-	e "jy.org/verse/src/entity"
-	"jy.org/verse/src/service"
+    "github.com/golang-jwt/jwt/v4"
+    echojwt "github.com/labstack/echo-jwt"
+    "github.com/labstack/echo/v4"
+    e "jy.org/verse/src/entity"
+    "jy.org/verse/src/service"
 )
-
-var authCfg = config.Config.Auth
 
 // jwtUserClaims are custom claims extending default ones.
 // See https://github.com/golang-jwt/jwt for more examples
 type jwtUserClaims struct {
     Id int `json:"id"`
-	jwt.RegisteredClaims
+    jwt.RegisteredClaims
 }
 
 var signKey = []byte(authCfg.Secret)
@@ -31,39 +28,39 @@ type Login struct {
 func login(c echo.Context) error {
     l := new(Login)
     if err := c.Bind(l); err != nil {
-        return err
+	return err
     }
     // TODO validation
     if l.Email == "" || l.Password == "" {
-        return echo.ErrUnauthorized
+	return echo.ErrUnauthorized
     }
 
     user, err := service.Authenticate(l.Email, l.Password)
     if err != nil {
-        return handleError(c, err)
+	return handleError(c, err)
     }
 
-	// Set custom claims
-	claims := &jwtUserClaims{
-        user.Id,
-		jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 72)),
-		},
-	}
+    // Set custom claims
+    claims := &jwtUserClaims{
+	user.Id,
+	jwt.RegisteredClaims{
+	    ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * authCfg.TokenDuration)),
+	},
+    }
 
-	// Create token with claims
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+    // Create token with claims
+    token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	// Generate encoded token and send it as response.
-	t, err := token.SignedString(signKey)
+    // Generate encoded token and send it as response.
+    t, err := token.SignedString(signKey)
     if err != nil {
-        return handleError(c, err)
+	return handleError(c, err)
     }
 
-	return c.JSONPretty(http.StatusOK, echo.Map{
-        "username": user.Name,
-		"token": t,
-	}, "  ")
+    return c.JSONPretty(http.StatusOK, echo.Map{
+	"username": user.Name,
+	"token": t,
+    }, "  ")
 }
 
 type Register struct {
@@ -76,21 +73,21 @@ func register(c echo.Context) error {
     // TODO validator
     r := new(Register)
     if err := c.Bind(r); err != nil {
-        return err
+	return err
     }
 
     user := e.RegistUser{
-        Name: r.Name,
-        Email: r.Email,
-        Password: r.Password,
+	Name: r.Name,
+	Email: r.Email,
+	Password: r.Password,
     }
     err := service.Register(user)
     if err != nil {
-        return handleError(c, err)
+	return handleError(c, err)
     }
 
     return c.JSON(http.StatusOK, echo.Map{
-        "message": "success",
+	"message": "success",
     })
 }
 
@@ -107,10 +104,10 @@ func handleAuth(e *echo.Echo) *echo.Group {
 
     r := e.Group("")
     config := echojwt.Config{
-        NewClaimsFunc: func(c echo.Context) jwt.Claims {
-            return new(jwtUserClaims)
-        },
-        SigningKey: signKey,
+	NewClaimsFunc: func(c echo.Context) jwt.Claims {
+	    return new(jwtUserClaims)
+	},
+	SigningKey: signKey,
     }
     r.Use(echojwt.WithConfig(config))
 

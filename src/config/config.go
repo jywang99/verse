@@ -40,6 +40,8 @@ type fileCfg struct {
 type authCfg struct {
     Secret string `yaml:"secret"`
     MediaSecret string `yaml:"mediaSecret"`
+    TokenDuration time.Duration `yaml:"tokenDuration"`
+    MediaTokenDuration time.Duration `yaml:"mediaTokenDuration"`
 }
 
 type logCfg struct {

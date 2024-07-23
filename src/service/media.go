@@ -21,13 +21,9 @@ func GetStaticContent(pPath, subPath string) (*os.File, string, error) {
         return nil, "", except.NewHandledError(except.BadRequestErr, "Invalid file type")
     }
 
-    file, stat, err := file.OpenFile(fPath)
+    file, _, err := file.OpenFile(fPath)
     if err != nil {
         return nil, "", err
-    }
-
-    if stat.Size() > cfg.File.MaxStreamSize {
-        return nil, "", except.NewHandledError(except.BadRequestErr, "File too large")
     }
 
     return file, mime, nil

@@ -42,8 +42,8 @@ func genMediaToken(path string) (string, error) {
     return ts, nil
 }
 
-func getTokenFromCookie(c echo.Context) (*jwtMediaClaims, error) {
-    cookie, err := c.Cookie("token")
+func getTokenFromCookie(c echo.Context, cname string) (*jwtMediaClaims, error) {
+    cookie, err := c.Cookie(cname)
     if err != nil {
         return nil, err
     }
@@ -59,55 +59,61 @@ func getTokenFromCookie(c echo.Context) (*jwtMediaClaims, error) {
 
 // TODO refactor
 func serveVideo(c echo.Context) error {
-    claims, err := getTokenFromCookie(c)
+    id, err := parseIdParam(c, "id")
     if err != nil {
-        return handleError(c, except.NewHandledError(except.AuthErr, "Failed to get token"))
+	return handleError(c, err)
+    }
+
+    claims, err := getTokenFromCookie(c, fmt.Sprintf("stream-%d", id))
+    if err != nil {
+	return handleError(c, except.NewHandledError(except.AuthErr, "Failed to get token"))
     }
 
     // get path from token
     path := claims.AllowedPath
     subPath := c.QueryParam("file")
+    logger.INFO.Println("Serving video: ", path, subPath)
 
-	// Open the video file
-	file, err := os.Open(filepath.Join(config.Config.File.MediaRoot, path, subPath))
-	if err != nil {
-		return c.String(http.StatusInternalServerError, fmt.Sprintf("Error opening video file: %v", err))
-	}
-	defer file.Close()
+    // Open the video file
+    file, err := os.Open(filepath.Join(config.Config.File.MediaRoot, path, subPath))
+    if err != nil {
+	return c.String(http.StatusInternalServerError, fmt.Sprintf("Error opening video file: %v", err))
+    }
+    defer file.Close()
 
-	// Get the file information
-	fileInfo, err := file.Stat()
-	if err != nil {
-		return c.String(http.StatusInternalServerError, fmt.Sprintf("Error getting file information: %v", err))
-	}
+    // Get the file information
+    fileInfo, err := file.Stat()
+    if err != nil {
+	return c.String(http.StatusInternalServerError, fmt.Sprintf("Error getting file information: %v", err))
+    }
 
     // Set the content type
-	c.Response().Header().Set("Content-Type", "video/mp4")
+    c.Response().Header().Set("Content-Type", "video/mp4")
 
-	// Get the Range header from the request
-	rangeHeader := c.Request().Header.Get("Range")
+    // Get the Range header from the request
+    rangeHeader := c.Request().Header.Get("Range")
     if rangeHeader == "" {
-        return handleError(c, except.NewHandledError(except.BadRequestErr, "Range header not found"))
+	return handleError(c, except.NewHandledError(except.BadRequestErr, "Range header not found"))
     }
 
     // Parse the Range header
     rangeParts := strings.Split(strings.TrimPrefix(rangeHeader, "bytes="), "-")
     if len(rangeParts) != 2 {
-        return handleError(c, except.NewHandledError(except.BadRequestErr, "Invalid range header"))
+	return handleError(c, except.NewHandledError(except.BadRequestErr, "Invalid range header"))
     }
     start, err := strconv.ParseInt(rangeParts[0], 10, 64)
     if err != nil {
-        return c.String(http.StatusRequestedRangeNotSatisfiable, "Invalid range start")
+	return c.String(http.StatusRequestedRangeNotSatisfiable, "Invalid range start")
     }
     end := fileInfo.Size() - 1
     if rangeParts[1] != "" {
-        end, err = strconv.ParseInt(rangeParts[1], 10, 64)
-        if err != nil {
-            return c.String(http.StatusRequestedRangeNotSatisfiable, "Invalid range end")
-        }
+	end, err = strconv.ParseInt(rangeParts[1], 10, 64)
+	if err != nil {
+	    return c.String(http.StatusRequestedRangeNotSatisfiable, "Invalid range end")
+	}
     }
     if start > end || end >= fileInfo.Size() {
-        return c.String(http.StatusRequestedRangeNotSatisfiable, "Range not satisfiable")
+	return c.String(http.StatusRequestedRangeNotSatisfiable, "Range not satisfiable")
     }
 
     // Set the content range header
@@ -119,29 +125,33 @@ func serveVideo(c echo.Context) error {
     // service.StreamVideo(path, subPath, end, c.Response().Writer)
     _, err = file.Seek(start, 0)
     if err != nil {
-        return c.String(http.StatusInternalServerError, fmt.Sprintf("Error seeking file: %v", err))
+	return c.String(http.StatusInternalServerError, fmt.Sprintf("Error seeking file: %v", err))
     }
     buffer := make([]byte, 1024*1024) // 1MB buffer size
     for {
-        n, err := file.Read(buffer)
-        if err != nil && err.Error() != "EOF" {
-            return c.String(http.StatusInternalServerError, fmt.Sprintf("Error reading file: %v", err))
-        }
-        if n == 0 {
-            break
-        }
-        if _, err := c.Response().Writer.Write(buffer[:n]); err != nil {
-            return c.String(http.StatusInternalServerError, fmt.Sprintf("Error writing file: %v", err))
-        }
-        c.Response().Flush()
+	n, err := file.Read(buffer)
+	if err != nil && err.Error() != "EOF" {
+	    return c.String(http.StatusInternalServerError, fmt.Sprintf("Error reading file: %v", err))
+	}
+	if n == 0 {
+	    break
+	}
+	if _, err := c.Response().Writer.Write(buffer[:n]); err != nil {
+	    return c.String(http.StatusInternalServerError, fmt.Sprintf("Error writing file: %v", err))
+	}
+	c.Response().Flush()
     }
 
     return nil
 }
 
 func getFullMedia(c echo.Context) error {
-    // get token from cookie
-    claims, err := getTokenFromCookie(c)
+    id, err := parseIdParam(c, "id")
+    if err != nil {
+	return handleError(c, err)
+    }
+
+    claims, err := getTokenFromCookie(c, fmt.Sprintf("static-%d", id))
     if err != nil {
         return handleError(c, except.NewHandledError(except.AuthErr, "Failed to get token"))
     }
@@ -159,7 +169,7 @@ func getFullMedia(c echo.Context) error {
 
 func handleMedia(e *echo.Echo) { // TODO unique url for each entry
     r := e.Group("/media")
-    r.GET("/static", getFullMedia)
+    r.GET("/static/:id", getFullMedia)
     r.GET("/stream/:id", serveVideo)
 }
 

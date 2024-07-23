@@ -18,6 +18,8 @@ file:
 auth:
   secret: secret
   mediaSecret: msecret
+  tokenDuration: 2592000
+  mediaTokenDuration: 3600
 log:
   path: ext/log/verse.log
 

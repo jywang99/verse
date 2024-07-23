@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -44,11 +45,19 @@ func getEntry(c echo.Context) error {
     }
 
     cookie := http.Cookie{
-        Name: "token",
+        Name: fmt.Sprintf("stream-%d", id),
         Value: token,
 	SameSite: http.SameSiteStrictMode,
-        Expires: time.Now().Add(time.Hour), // TODO config
-        Path: "/media", // TODO one for each entry
+        Expires: time.Now().Add(time.Second * authCfg.MediaTokenDuration),
+        Path: fmt.Sprintf("/media/stream/%d", id),
+    }
+    c.SetCookie(&cookie)
+    cookie = http.Cookie{
+        Name: fmt.Sprintf("static-%d", id),
+        Value: token,
+	SameSite: http.SameSiteStrictMode,
+        Expires: time.Now().Add(time.Second * authCfg.MediaTokenDuration),
+        Path: fmt.Sprintf("/media/static/%d", id),
     }
     c.SetCookie(&cookie)
 
