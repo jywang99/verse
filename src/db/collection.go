@@ -6,6 +6,7 @@ import (
 
 	cs "jy.org/verse/src/constant"
 	e "jy.org/verse/src/entity"
+	"jy.org/verse/src/except"
 )
 
 func (conn *dbConn) GetCollections(gc e.GetCollections) (e.GotCollections, error) {
@@ -62,5 +63,30 @@ func getCollectiionWhere(gc e.GetCollections) (string, []any) {
     }
 
     return query, args
+}
+
+func (conn *dbConn) GetCollectionsByIds(ids []int) ([]e.GotCollection, error) {
+    query := fmt.Sprintf("SELECT %s, %s FROM %s WHERE %s IN (%s)", cs.Id, cs.DispName, cs.CollectionTable, cs.Id, arrayToString(ids, ","))
+    rows, err := conn.pool.Query(context.Background(), query)
+    if err != nil {
+        logger.ERROR.Println("Error while getting collections: ", err)
+        return nil, err
+    }
+    defer rows.Close()
+
+    colls := make([]e.GotCollection, len(ids))
+    i := 0
+    for rows.Next() {
+        var coll e.GotCollection
+        err = rows.Scan(&coll.Id, &coll.Name)
+        if err != nil {
+            logger.ERROR.Println("Error while scanning collections: ", err)
+            return nil, except.NewHandledError(except.DbErr, "Error while scanning collections")
+        }
+        colls[i] = coll
+        i ++
+    }
+
+    return colls, nil
 }
 

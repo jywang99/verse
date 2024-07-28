@@ -27,3 +27,12 @@ func GetCollection(gc entity.GetCollections) (entity.GotCollections, error) {
     return colls, nil
 }
 
+func GetCollectionsByIds(ids []int) ([]entity.GotCollection, error) {
+    got, err := conn.GetCollectionsByIds(ids)
+    if err != nil {
+        return nil, err
+    }
+
+    return got, nil
+}
+

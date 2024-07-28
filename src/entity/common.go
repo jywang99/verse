@@ -40,3 +40,7 @@ func (pg Paging) Validate() error {
     return nil
 }
 
+type GetByIds struct {
+    Ids []int `json:"ids"`
+}
+

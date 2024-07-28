@@ -36,3 +36,12 @@ func GetCastById(id int) (*entity.GotCast, error) {
     return got, nil
 }
 
+func GetCastByIds(ids []int) ([]entity.GotCastLite, error) {
+    got, err := conn.GetCastsByIds(ids)
+    if err != nil {
+        return nil, err
+    }
+
+    return got, nil
+}
+

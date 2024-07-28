@@ -44,3 +44,12 @@ func GetTagById(id int) (*entity.GotTag, error) {
     return got, nil
 }
 
+func GetTagsByIds(ids []int) ([]entity.GotTagLite, error) {
+    got, err := conn.GetTagsByIds(ids)
+    if err != nil {
+        return nil, err
+    }
+
+    return got, nil
+}
+

@@ -28,24 +28,24 @@ type Login struct {
 func login(c echo.Context) error {
     l := new(Login)
     if err := c.Bind(l); err != nil {
-	return err
+        return err
     }
     // TODO validation
     if l.Email == "" || l.Password == "" {
-	return echo.ErrUnauthorized
+        return echo.ErrUnauthorized
     }
 
     user, err := service.Authenticate(l.Email, l.Password)
     if err != nil {
-	return handleError(c, err)
+        return handleError(c, err)
     }
 
     // Set custom claims
     claims := &jwtUserClaims{
-	user.Id,
-	jwt.RegisteredClaims{
-	    ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * authCfg.TokenDuration)),
-	},
+        user.Id,
+        jwt.RegisteredClaims{
+            ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * authCfg.TokenDuration)),
+        },
     }
 
     // Create token with claims
@@ -54,12 +54,12 @@ func login(c echo.Context) error {
     // Generate encoded token and send it as response.
     t, err := token.SignedString(signKey)
     if err != nil {
-	return handleError(c, err)
+        return handleError(c, err)
     }
 
     return c.JSONPretty(http.StatusOK, echo.Map{
-	"username": user.Name,
-	"token": t,
+        "username": user.Name,
+        "token": t,
     }, "  ")
 }
 
