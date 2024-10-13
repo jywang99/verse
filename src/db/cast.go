@@ -58,11 +58,12 @@ func (conn *dbConn) GetCasts(gc e.GetCasts) ([]e.GotCastLite, error) {
 
     rows, err := conn.pool.Query(context.Background(), query, args...)
     if err != nil {
+        logger.ERROR.Println("Error while getting casts: ", err)
         return nil, err
     }
     defer rows.Close()
 
-    var casts []e.GotCastLite
+    casts := []e.GotCastLite{}
     for rows.Next() {
         var cast e.GotCastLite
         err = rows.Scan(&cast.Id, &cast.Name, &cast.Pic)
@@ -95,7 +96,7 @@ func getCastsWhere(gc e.GetCasts) (string, []any) {
     var where string
     var args []interface{}
 
-    if gc.Keyword != nil {
+    if gc.Keyword != nil && *gc.Keyword != "" {
         where += fmt.Sprintf(" WHERE %s ILIKE $1", cs.Name)
         args = append(args, fmt.Sprintf("%%%s%%", *gc.Keyword))
     }

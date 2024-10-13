@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"flag"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -16,7 +17,7 @@ var cfg = config.Config
 var logger = logging.Logger
 
 func main() {
-    config.Init("conf/config.yml")
+    config.Init(parseArgs())
     logging.Init()
     db.Init()
 
@@ -52,5 +53,12 @@ func main() {
     controller.HandlePaths(e)
 
     e.Logger.Fatal(e.Start(fmt.Sprintf(":%v", cfg.Server.Port)))
+}
+
+func parseArgs() string {
+    var ymlPath string
+    flag.StringVar(&ymlPath, "f", "conf/config.yml", "Path to the configuration file")
+    flag.Parse()
+    return ymlPath
 }
 
