@@ -47,11 +47,16 @@ type GotEntry struct {
     Meta GotEntryLite `json:"meta"`
     Path string `json:"path"`
     Files []string `json:"files"`
+    Tags []GotTagLite `json:"tags"`
+    Casts []GotCastLite `json:"casts"`
+    Parent *GotCollection `json:"parent"`
 }
 
 func NewGotEntry() GotEntry {
     return GotEntry{
         Meta: GotEntryLite{},
+        Tags: make([]GotTagLite, 0),
+        Casts: make([]GotCastLite, 0),
     }
 }
 
