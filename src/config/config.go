@@ -80,7 +80,7 @@ var Config = &config{
     },
 }
 
-func Validate() error {
+func validate() error {
     server := Config.Server
     if server.Port == 0 {
         return errors.New("Invalid server port")

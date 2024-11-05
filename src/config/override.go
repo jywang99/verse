@@ -1,6 +1,7 @@
 package config
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -9,8 +10,15 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func Init(configPath string) {
-    f, err := os.Open(configPath)
+func parseArgs() string {
+    var ymlPath string
+    flag.StringVar(&ymlPath, "f", "conf/config.yml", "Path to the configuration file")
+    flag.Parse()
+    return ymlPath
+}
+
+func init() {
+    f, err := os.Open(parseArgs())
     if err != nil {
         log.Fatal(fmt.Errorf("Error loading config yml file: %v", err))
     }
@@ -23,6 +31,11 @@ func Init(configPath string) {
 
     decoder := yaml.NewDecoder(f)
     err = decoder.Decode(&Config)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    err = validate()
     if err != nil {
         log.Fatal(err)
     }

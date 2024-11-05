@@ -31,7 +31,7 @@ func (tracer *queryTracer) TraceQueryStart(ctx context.Context, _ *pgx.Conn, dat
 func (tracer *queryTracer) TraceQueryEnd(ctx context.Context, conn *pgx.Conn, data pgx.TraceQueryEndData) {
 }
 
-func Init() {
+func init() {
 	// urlExample := "postgres://username:password@localhost:5432/database_name"
     url := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?search_path=%s", cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Database, cfg.Schema)
 
